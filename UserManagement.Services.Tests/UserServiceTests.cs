@@ -1,8 +1,9 @@
 using System.Linq;
+using UserManagement.Data;
 using UserManagement.Models;
 using UserManagement.Services.Domain.Implementations;
 
-namespace UserManagement.Data.Tests;
+namespace UserManagement.Services.Tests;
 
 public class UserServiceTests
 {
@@ -18,6 +19,35 @@ public class UserServiceTests
 
         // Assert: Verifies that the action of the method under test behaves as expected.
         result.Should().BeSameAs(users);
+    }
+
+    [Fact]
+    public void FilterByActive_WhenActiveIsTrue_MustReturnOnlyActiveUsers()
+    {
+        // Arrange
+        var service = CreateService();
+        var users = SetupUsersWithMixedActiveStatus();
+
+        // Act
+        var result = service.FilterByActive(true);
+
+        // Assert
+        result.Should().AllSatisfy(u => u.IsActive.Should().BeTrue());
+
+    }
+
+    [Fact]
+    public void FilterByActive_WhenActiveIsFalse_MustReturnOnlyNonActiveUsers()
+    {
+        // Arrange
+        var service = CreateService();
+        var users = SetupUsersWithMixedActiveStatus();
+
+        // Act
+        var result = service.FilterByActive(false);
+
+        // Assert
+        result.Should().AllSatisfy(u => u.IsActive.Should().BeFalse());
     }
 
     private IQueryable<User> SetupUsers(string forename = "Johnny", string surname = "User", string email = "juser@example.com", bool isActive = true)
@@ -36,6 +66,23 @@ public class UserServiceTests
         _dataContext
             .Setup(s => s.GetAll<User>())
             .Returns(users);
+
+        return users;
+    }
+
+    private IQueryable<User> SetupUsersWithMixedActiveStatus()
+    {
+        var users = new[] {
+            new User{
+                Forename = "Active", Surname= "User", Email = "email@email.com", IsActive = true,
+            },
+            new User{
+                Forename = "NonActive", Surname= "User", Email = "email@email.com", IsActive = false,
+            }
+        }.AsQueryable();
+
+        _dataContext
+        .Setup(s => s.GetAll<User>()).Returns(users);
 
         return users;
     }

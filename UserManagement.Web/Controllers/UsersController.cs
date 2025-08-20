@@ -1,19 +1,28 @@
 ﻿using System.Linq;
+using UserManagement.Models;
 using UserManagement.Services.Domain.Interfaces;
 using UserManagement.Web.Models.Users;
 
-namespace UserManagement.WebMS.Controllers;
+namespace UserManagement.Web.Controllers;
 
 [Route("users")]
-public class UsersController : Controller
+public class UsersController(IUserService userService) : Controller
 {
-    private readonly IUserService _userService;
-    public UsersController(IUserService userService) => _userService = userService;
+    private readonly IUserService _userService = userService;
 
     [HttpGet]
-    public ViewResult List()
+    public ViewResult List(string filter = "")
     {
-        var items = _userService.GetAll().Select(p => new UserListItemViewModel
+        IEnumerable<User> users;
+        if (filter == "active")
+            users = _userService.FilterByActive(true);
+        else if (filter == "nonactive")
+            users = _userService.FilterByActive(false);
+        else
+            users = _userService.GetAll();
+
+        
+        var items = users.Select(p => new UserListItemViewModel
         {
             Id = p.Id,
             Forename = p.Forename,
@@ -29,4 +38,6 @@ public class UsersController : Controller
 
         return View(model);
     }
+
+
 }
