@@ -2,6 +2,8 @@ using UserManagement.Models;
 using UserManagement.Services.Domain.Interfaces;
 using UserManagement.Web.Models.Users;
 using UserManagement.Web.Controllers;
+using Microsoft.AspNetCore.Mvc;
+using System;
 
 namespace UserManagement.Data.Tests;
 
@@ -21,6 +23,34 @@ public class UserControllerTests
         result.Model
             .Should().BeOfType<UserListViewModel>()
             .Which.Items.Should().BeEquivalentTo(users);
+    }
+
+    [Fact]
+    public void AddUser_Post_ValidModel_SavesAndRedirects()
+    {
+
+        var controller = CreateController();
+        // Arrange
+        var userViewModel = new UserViewModel
+        {
+            Forename = "John",
+            Surname = "Doe",
+            Email = "john.doe@example.com",
+            DateOfBirth = new DateTime(1990, 1, 1)
+        };
+
+        // Act
+        var result = controller.AddUser(userViewModel);
+
+        // Assert
+        result.Should().BeOfType<RedirectToActionResult>()
+            .Which.ActionName.Should().Be("List");
+
+        _userService.Verify(s => s.Create(It.Is<User>(u =>
+            u.Forename == userViewModel.Forename &&
+            u.Surname == userViewModel.Surname &&
+            u.Email == userViewModel.Email &&
+            u.DateOfBirth == userViewModel.DateOfBirth)), Times.Once());
     }
 
     private User[] SetupUsers(string forename = "Johnny", string surname = "User", string email = "juser@example.com", bool isActive = true)
