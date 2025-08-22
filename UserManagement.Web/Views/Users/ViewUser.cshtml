@@ -1,0 +1,15 @@
+@model UserManagement.Web.Models.Users.UserViewModel
+<h2>User Details</h2>
+<dl>
+    <dt>Forename</dt>
+    <dd>@Model.Forename</dd>
+    <dt>Surname</dt>
+    <dd>@Model.Surname</dd>
+    <dt>Email</dt>
+    <dd>@Model.Email</dd>
+    <dt>Date of Birth</dt>
+    <dd>@(Model.DateOfBirth.HasValue? Model.DateOfBirth.Value.ToString("dd/MM/yyyy") : "")</dd>
+    <dt>Active</dt>
+    <dd>@(Model.IsActive ? "Yes" : "No")</dd>
+</dl>
+<a asp-controller="Users" asp-action="List">Back to List</a>

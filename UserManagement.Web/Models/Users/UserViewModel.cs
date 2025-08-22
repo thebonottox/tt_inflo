@@ -5,7 +5,7 @@ namespace UserManagement.Web.Models.Users;
 
 public class UserViewModel
 {
-    public int Id { get; set; }
+    public long Id { get; set; }
 
     [Required(ErrorMessage = "Forename is required")]
     [StringLength(50, ErrorMessage = "Forename cannot exceed 50 characters")]
