@@ -1,4 +1,8 @@
-﻿namespace UserManagement.Web.Models.Users;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
+using Microsoft.VisualBasic;
+
+namespace UserManagement.Web.Models.Users;
 
 public class UserListViewModel
 {
@@ -12,4 +16,7 @@ public class UserListItemViewModel
     public string? Surname { get; set; }
     public string? Email { get; set; }
     public bool IsActive { get; set; }
+
+    [DataType(DataType.Date)]
+    public DateTime? DateOfBirth { get; set; }
 }

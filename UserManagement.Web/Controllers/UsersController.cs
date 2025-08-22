@@ -21,14 +21,15 @@ public class UsersController(IUserService userService) : Controller
         else
             users = _userService.GetAll();
 
-        
+
         var items = users.Select(p => new UserListItemViewModel
         {
             Id = p.Id,
             Forename = p.Forename,
             Surname = p.Surname,
             Email = p.Email,
-            IsActive = p.IsActive
+            IsActive = p.IsActive,
+            DateOfBirth = p.DateOfBirth
         });
 
         var model = new UserListViewModel
