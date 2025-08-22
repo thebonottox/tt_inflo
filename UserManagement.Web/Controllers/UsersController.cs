@@ -40,5 +40,31 @@ public class UsersController(IUserService userService) : Controller
         return View(model);
     }
 
+    [HttpGet]
+    [Route("addUser")]
+    public ViewResult AddUser()
+    {
+        return View(new UserViewModel());
+    }
+
+    [HttpPost]
+    [Route("addUser")]
+    public IActionResult AddUser(UserViewModel model)
+    {
+        if (ModelState.IsValid)
+        {
+            var user = new User
+            {
+                Forename = model.Forename,
+                Surname = model.Surname,
+                Email = model.Email,
+                IsActive = model.IsActive,
+                DateOfBirth = model.DateOfBirth
+            };
+            _userService.Create(user);
+            return RedirectToAction("List");
+        }
+        return View(model);
+    }
 
 }
