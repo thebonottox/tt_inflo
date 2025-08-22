@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using FluentAssertions;
 using UserManagement.Models;
@@ -44,5 +45,25 @@ public class DataContextTests
         result.Should().NotContain(s => s.Email == entity.Email);
     }
 
+    [Fact]
+    public void CreateAndGetAll_WhenUserWithDateOfBirthAdded_RetrievesCorrectDate()
+    {
+        var context = CreateContext();
+        var entity = new User
+        {
+            Forename = "Test",
+            Surname = "User",
+            Email = "test@example.com",
+            DateOfBirth = new DateTime(1992, 1, 21)
+        };
+
+        context.Create(entity);
+
+        // Act
+        var result = context.GetAll<User>();
+
+        result.Should().Contain(u => u.Email == entity.Email && u.DateOfBirth == entity.DateOfBirth)
+            .Which.Should().BeEquivalentTo(entity);
+    }
     private DataContext CreateContext() => new();
 }
