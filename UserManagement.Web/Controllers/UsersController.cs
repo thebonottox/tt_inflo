@@ -86,4 +86,46 @@ public class UsersController(IUserService userService) : Controller
         return View(model);
     }
 
+    [HttpGet]
+    [Route("editUser/{id}")]
+    public IActionResult EditUser(long id)
+    {
+        var user = _userService.GetById(id);
+        if (user == null)
+            return NotFound();
+        var model = new UserViewModel
+        {
+            Id = user.Id,
+            Forename = user.Forename,
+            Surname = user.Surname,
+            Email = user.Email,
+            IsActive = user.IsActive,
+            DateOfBirth = user.DateOfBirth
+        };
+        return View(model);
+    }
+
+    [HttpPost]
+    [Route("editUser/{id}")]
+    public IActionResult EditUser(long id, UserViewModel model)
+    {
+        if (id != model.Id)
+            return BadRequest();
+
+        if (ModelState.IsValid)
+        {
+            var user = new User
+            {
+                Id = model.Id,
+                Forename = model.Forename,
+                Surname = model.Surname,
+                Email = model.Email,
+                IsActive = model.IsActive,
+                DateOfBirth = model.DateOfBirth
+            };
+            _userService.Update(user);
+            return RedirectToAction("List");
+        }
+        return View(model);
+    }
 }
