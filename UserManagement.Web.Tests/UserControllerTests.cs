@@ -53,6 +53,39 @@ public class UserControllerTests
             u.DateOfBirth == userViewModel.DateOfBirth)), Times.Once());
     }
 
+    [Fact]
+    public void ViewUser_ValidId_ReturnsViewWithUser()
+    {
+        var controller = CreateController();
+
+        // Arrange
+        var user = new User
+        {
+            Id = 1,
+            Forename = "John",
+            Surname = "Doe",
+            Email = "john.doe@example.com",
+            DateOfBirth = new DateTime(1990, 1, 1)
+        };
+        _userService.Setup(s => s.GetById(1)).Returns(user);
+
+        // Act
+        var result = controller.ViewUser(1);
+
+        // Assert
+        result.Should().BeOfType<ViewResult>()
+            .Which.Model.Should().BeOfType<UserViewModel>()
+            .Which.Should().BeEquivalentTo(new UserViewModel
+            {
+                Id = user.Id,
+                Forename = user.Forename,
+                Surname = user.Surname,
+                Email = user.Email,
+                DateOfBirth = user.DateOfBirth
+            });
+    }
+
+
     private User[] SetupUsers(string forename = "Johnny", string surname = "User", string email = "juser@example.com", bool isActive = true)
     {
         var users = new[]
