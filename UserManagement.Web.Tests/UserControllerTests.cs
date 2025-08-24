@@ -85,6 +85,58 @@ public class UserControllerTests
             });
     }
 
+    [Fact]
+    public void EditUser_Get_ValidId_ReturnsViewWithUser()
+    {
+        var controller = CreateController();
+        var user = new User
+        {
+            Id = 1,
+            Forename = "John",
+            Surname = "Doe",
+            Email = "john.doe@example.com",
+            DateOfBirth = new DateTime(1990, 1, 1)
+        };
+        _userService.Setup(s => s.GetById(1)).Returns(user);
+
+        var result = controller.EditUser(1);
+
+        result.Should().BeOfType<ViewResult>()
+            .Which.Model.Should().BeOfType<UserViewModel>()
+            .Which.Should().BeEquivalentTo(new UserViewModel
+            {
+                Id = user.Id,
+                Forename = user.Forename,
+                Surname = user.Surname,
+                Email = user.Email,
+                DateOfBirth = user.DateOfBirth
+            });
+    }
+
+    [Fact]
+    public void EditUser_Post_ValidModel_UpdatesAndRedirects()
+    {
+        var controller = CreateController();
+        var userViewModel = new UserViewModel
+        {
+            Id = 1,
+            Forename = "John",
+            Surname = "Doe",
+            Email = "john.doe@example.com",
+            DateOfBirth = new DateTime(1990, 1, 1)
+        };
+
+        var result = controller.EditUser(1, userViewModel);
+
+        result.Should().BeOfType<RedirectToActionResult>()
+            .Which.ActionName.Should().Be("List");
+        _userService.Verify(s => s.Update(It.Is<User>(u =>
+            u.Id == userViewModel.Id &&
+            u.Forename == userViewModel.Forename &&
+            u.Surname == userViewModel.Surname &&
+            u.Email == userViewModel.Email &&
+            u.DateOfBirth == userViewModel.DateOfBirth)), Times.Once());
+    }
 
     private User[] SetupUsers(string forename = "Johnny", string surname = "User", string email = "juser@example.com", bool isActive = true)
     {

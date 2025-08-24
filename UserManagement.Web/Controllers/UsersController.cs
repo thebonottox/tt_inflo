@@ -93,6 +93,7 @@ public class UsersController(IUserService userService) : Controller
         var user = _userService.GetById(id);
         if (user == null)
             return NotFound();
+
         var model = new UserViewModel
         {
             Id = user.Id,
