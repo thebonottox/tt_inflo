@@ -129,4 +129,34 @@ public class UsersController(IUserService userService) : Controller
         }
         return View(model);
     }
+
+    [HttpGet]
+    [Route("deleteUser/{id}")]
+    public IActionResult DeleteUser(long id)
+    {
+        var user = _userService.GetById(id);
+        if (user == null)
+            return NotFound();
+
+        var model = new UserViewModel
+        {
+            Id = user.Id,
+            Forename = user.Forename,
+            Surname = user.Surname,
+            Email = user.Email,
+            IsActive = user.IsActive,
+            DateOfBirth = user.DateOfBirth
+        };
+        return View(model);
+    }
+
+    [HttpPost, ActionName("DeleteUser")]
+    [Route("deleteUser/{id}")]
+    public IActionResult DeleteUserConfirmed(long id)
+    {
+        var user = _userService.GetById(id);
+        if (user == null) return NotFound();
+        _userService.Delete(id);
+        return RedirectToAction("List");
+    }
 }

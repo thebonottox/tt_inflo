@@ -24,6 +24,11 @@ public class UserService : IUserService
         return _dataAccess.GetAll<User>().Where(u => u.IsActive == isActive);
     }
     public IEnumerable<User> GetAll() => _dataAccess.GetAll<User>();
+
+    public User? GetById(long id)
+    {
+        return _dataAccess.GetAll<User>().FirstOrDefault(u => u.Id == id);
+    }
     public void Create(User user) => _dataAccess.Create(user);
 
     public void Update(User user)
@@ -31,8 +36,12 @@ public class UserService : IUserService
         _dataAccess.Update(user);
     }
 
-    public User? GetById(long id)
+    public void Delete(long id)
     {
-        return _dataAccess.GetAll<User>().FirstOrDefault(u => u.Id == id);
+        var user = _dataAccess.GetAll<User>().FirstOrDefault(u => u.Id == id);
+        if (user != null)
+        {
+            _dataAccess.Delete(user);
+        }
     }
 }
