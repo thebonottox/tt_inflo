@@ -1,4 +1,5 @@
 using System.Linq;
+using System.Threading.Tasks;
 using UserManagement.Data;
 using UserManagement.Models;
 using UserManagement.Services.Domain.Implementations;
@@ -8,28 +9,28 @@ namespace UserManagement.Services.Tests;
 public class UserServiceTests
 {
     [Fact]
-    public void GetAll_WhenContextReturnsEntities_MustReturnSameEntities()
+    public async Task GetAll_WhenContextReturnsEntities_MustReturnSameEntities()
     {
         // Arrange: Initializes objects and sets the value of the data that is passed to the method under test.
         var service = CreateService();
         var users = SetupUsers();
 
         // Act: Invokes the method under test with the arranged parameters.
-        var result = service.GetAll();
+        var result = await service.GetAllAsync();
 
         // Assert: Verifies that the action of the method under test behaves as expected.
-        result.Should().BeSameAs(users);
+        result.Should().BeSameAs((System.Collections.Generic.IEnumerable<User>)users);
     }
 
     [Fact]
-    public void FilterByActive_WhenActiveIsTrue_MustReturnOnlyActiveUsers()
+    public async Task FilterByActive_WhenActiveIsTrue_MustReturnOnlyActiveUsers()
     {
         // Arrange
         var service = CreateService();
         var users = SetupUsersWithMixedActiveStatus();
 
         // Act
-        var result = service.FilterByActive(true);
+        var result = await service.FilterByActiveAsync(true);
 
         // Assert
         result.Should().AllSatisfy(u => u.IsActive.Should().BeTrue());
@@ -37,14 +38,14 @@ public class UserServiceTests
     }
 
     [Fact]
-    public void FilterByActive_WhenActiveIsFalse_MustReturnOnlyNonActiveUsers()
+    public async Task FilterByActive_WhenActiveIsFalse_MustReturnOnlyNonActiveUsers()
     {
         // Arrange
         var service = CreateService();
         var users = SetupUsersWithMixedActiveStatus();
 
         // Act
-        var result = service.FilterByActive(false);
+        var result = await service.FilterByActiveAsync(false);
 
         // Assert
         result.Should().AllSatisfy(u => u.IsActive.Should().BeFalse());
@@ -64,8 +65,8 @@ public class UserServiceTests
         }.AsQueryable();
 
         _dataContext
-            .Setup(s => s.GetAll<User>())
-            .Returns(users);
+           .Setup(s => s.GetAllAsync<User>())
+           .ReturnsAsync(users);
 
         return users;
     }
@@ -82,7 +83,7 @@ public class UserServiceTests
         }.AsQueryable();
 
         _dataContext
-        .Setup(s => s.GetAll<User>()).Returns(users);
+        .Setup(s => s.GetAllAsync<User>()).ReturnsAsync(users);
 
         return users;
     }
