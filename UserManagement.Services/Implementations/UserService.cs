@@ -19,29 +19,34 @@ public class UserService : IUserService
     /// </summary>
     /// <param name="isActive"></param>
     /// <returns></returns>
-    public IEnumerable<User> FilterByActive(bool isActive)
+    public async Task<IEnumerable<User>> FilterByActiveAsync(bool isActive)
     {
-        return _dataAccess.GetAll<User>().Where(u => u.IsActive == isActive);
+        var users = await _dataAccess.GetAllAsync<User>();
+        return users.Where(u => u.IsActive == isActive);
     }
-    public IEnumerable<User> GetAll() => _dataAccess.GetAll<User>();
-
-    public User? GetById(long id)
+    public async Task<IEnumerable<User>> GetAllAsync()
     {
-        return _dataAccess.GetAll<User>().FirstOrDefault(u => u.Id == id);
-    }
-    public void Create(User user) => _dataAccess.Create(user);
-
-    public void Update(User user)
-    {
-        _dataAccess.Update(user);
+        return await _dataAccess.GetAllAsync<User>();
     }
 
-    public void Delete(long id)
+    public async Task<User?> GetByIdAsync(long id)
     {
-        var user = _dataAccess.GetAll<User>().FirstOrDefault(u => u.Id == id);
+        var users = await _dataAccess.GetAllAsync<User>();
+        return users.FirstOrDefault(u => u.Id == id);
+    }
+    public async Task CreateAsync(User user)
+    {
+        await _dataAccess.CreateAsync(user);
+    }
+
+    public async Task UpdateAsync(User user) => await _dataAccess.UpdateAsync(user);
+
+    public async Task DeleteAsync(long id)
+    {
+        var user = await GetByIdAsync(id);
         if (user != null)
         {
-            _dataAccess.Delete(user);
+            await _dataAccess.DeleteAsync(user);
         }
     }
 }

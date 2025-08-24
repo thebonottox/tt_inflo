@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Threading.Tasks;
 using UserManagement.Models;
 using UserManagement.Services.Domain.Interfaces;
 using UserManagement.Web.Models.Users;
@@ -11,15 +12,15 @@ public class UsersController(IUserService userService) : Controller
     private readonly IUserService _userService = userService;
 
     [HttpGet]
-    public ViewResult List(string filter = "")
+    public async Task<IActionResult> List(string filter = "")
     {
         IEnumerable<User> users;
         if (filter == "active")
-            users = _userService.FilterByActive(true);
+            users = await _userService.FilterByActiveAsync(true);
         else if (filter == "nonactive")
-            users = _userService.FilterByActive(false);
+            users = await _userService.FilterByActiveAsync(false);
         else
-            users = _userService.GetAll();
+            users = await _userService.GetAllAsync();
 
 
         var items = users.Select(p => new UserListItemViewModel
@@ -49,7 +50,7 @@ public class UsersController(IUserService userService) : Controller
 
     [HttpPost]
     [Route("addUser")]
-    public IActionResult AddUser(UserViewModel model)
+    public async Task<IActionResult> AddUser(UserViewModel model)
     {
         if (ModelState.IsValid)
         {
@@ -61,7 +62,7 @@ public class UsersController(IUserService userService) : Controller
                 IsActive = model.IsActive,
                 DateOfBirth = model.DateOfBirth
             };
-            _userService.Create(user);
+            await _userService.CreateAsync(user);
             return RedirectToAction("List");
         }
         return View(model);
@@ -69,9 +70,9 @@ public class UsersController(IUserService userService) : Controller
 
     [HttpGet]
     [Route("viewUser/{id}")]
-    public IActionResult ViewUser(long id)
+    public async Task<IActionResult> ViewUser(long id)
     {
-        var user = _userService.GetById(id);
+        var user = await _userService.GetByIdAsync(id);
         if (user == null)
             return NotFound();
         var model = new UserViewModel
@@ -88,9 +89,9 @@ public class UsersController(IUserService userService) : Controller
 
     [HttpGet]
     [Route("editUser/{id}")]
-    public IActionResult EditUser(long id)
+    public async Task<IActionResult> EditUser(long id)
     {
-        var user = _userService.GetById(id);
+        var user = await _userService.GetByIdAsync(id);
         if (user == null)
             return NotFound();
 
@@ -108,7 +109,7 @@ public class UsersController(IUserService userService) : Controller
 
     [HttpPost]
     [Route("editUser/{id}")]
-    public IActionResult EditUser(long id, UserViewModel model)
+    public async Task<IActionResult> EditUser(long id, UserViewModel model)
     {
         if (id != model.Id)
             return BadRequest();
@@ -124,7 +125,7 @@ public class UsersController(IUserService userService) : Controller
                 IsActive = model.IsActive,
                 DateOfBirth = model.DateOfBirth
             };
-            _userService.Update(user);
+            await _userService.UpdateAsync(user);
             return RedirectToAction("List");
         }
         return View(model);
@@ -132,9 +133,9 @@ public class UsersController(IUserService userService) : Controller
 
     [HttpGet]
     [Route("deleteUser/{id}")]
-    public IActionResult DeleteUser(long id)
+    public async Task<IActionResult> DeleteUser(long id)
     {
-        var user = _userService.GetById(id);
+        var user = await _userService.GetByIdAsync(id);
         if (user == null)
             return NotFound();
 
@@ -152,11 +153,11 @@ public class UsersController(IUserService userService) : Controller
 
     [HttpPost, ActionName("DeleteUser")]
     [Route("deleteUser/{id}")]
-    public IActionResult DeleteUserConfirmed(long id)
+    public async Task<IActionResult> DeleteUserConfirmed(long id)
     {
-        var user = _userService.GetById(id);
+        var user = await _userService.GetByIdAsync(id);
         if (user == null) return NotFound();
-        _userService.Delete(id);
+        await _userService.DeleteAsync(id);
         return RedirectToAction("List");
     }
 }
