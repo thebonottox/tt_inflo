@@ -138,6 +138,18 @@ public class UserControllerTests
             u.DateOfBirth == userViewModel.DateOfBirth)), Times.Once());
     }
 
+    [Fact]
+    public void DeleteUserConfirmed_ValidId_DeletesAndRedirects()
+    {
+        var controller = CreateController();
+        var user = new User { Id = 1 };
+        _userService.Setup(s => s.GetById(1)).Returns(user);
+        var result = controller.DeleteUserConfirmed(1);
+        result.Should().BeOfType<RedirectToActionResult>()
+            .Which.ActionName.Should().Be("List");
+        _userService.Verify(s => s.Delete(1), Times.Once());
+    }
+
     private User[] SetupUsers(string forename = "Johnny", string surname = "User", string email = "juser@example.com", bool isActive = true)
     {
         var users = new[]
